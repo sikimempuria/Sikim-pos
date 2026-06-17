@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
+import { AppNavigation } from "@/components/navigation";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Sikim POS",
-  description: "Workspace inicial del TPV interno de Sikim.",
+  description: "Shell inicial del TPV interno de Sikim.",
 };
 
 export default function RootLayout({
@@ -13,7 +14,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" className="h-full antialiased">
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full bg-slate-950 text-slate-100">
+        <AppNavigation />
+        {children}
+      </body>
     </html>
   );
 }
