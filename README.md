@@ -26,11 +26,11 @@ Actualmente:
 
 - `AGENTS.md` define las instrucciones de trabajo para agentes y colaboradores;
 - [`docs/architecture/pos-v1.md`](docs/architecture/pos-v1.md) contiene la arquitectura inicial de POS V1;
-- no existe todavia un scaffold de aplicacion de produccion;
+- existe un scaffold inicial de aplicacion con Next.js, React, TypeScript, Tailwind CSS, ESLint y npm;
 - no existen migraciones de base de datos POS;
 - Supabase no esta configurado todavia en este repositorio;
 - Vercel no esta configurado todavia en este repositorio;
-- los comandos de runtime, lint o build pueden no existir hasta que se cree el scaffold de aplicacion.
+- existen scripts npm para desarrollo, lint, build y start.
 
 No se deben asumir funcionalidades implementadas solo porque esten descritas como direccion futura.
 
@@ -76,7 +76,7 @@ Salvo que el proyecto decida explicitamente otra cosa, la direccion tecnica prev
 - Supabase cuando empiece la integracion de backend y datos;
 - Vercel cuando empiece el despliegue.
 
-Estos puntos describen una direccion prevista. No significan que el scaffold, la configuracion o las integraciones ya existan.
+El scaffold inicial ya sigue esta direccion. Supabase, Vercel y las integraciones siguen pendientes.
 
 ## Fuera del alcance actual
 
@@ -110,7 +110,7 @@ El flujo recomendado para este repositorio es:
 - separar scaffold de aplicacion, esquema, Supabase y Vercel en PRs distintos;
 - no tocar archivos no relacionados.
 
-Para cambios solo de documentacion, el check esperado actualmente es `git diff --check` cuando aplique. No deben ejecutarse ni inventarse checks de runtime si todavia no existe scaffold de aplicacion.
+Para cambios solo de documentacion, el check esperado actualmente es `git diff --check` cuando aplique. Para cambios de aplicacion, usar los scripts disponibles en `package.json`.
 
 ## Seguridad y datos sensibles
 
@@ -123,8 +123,8 @@ Los datos POS son sensibles porque pueden incluir pedidos, datos de clientes, ac
 ## Proximos pasos
 
 1. Mantener la documentacion de arquitectura como fuente de verdad.
-2. Crear el scaffold inicial con Next.js, npm y Node.js 20.
-3. Conectar Vercel despues de que el scaffold compile correctamente.
+2. Mantener el scaffold inicial con Next.js, npm y Node.js 20.
+3. Conectar Vercel despues de acordar el paso de despliegue.
 4. Decidir integracion Supabase staging vs. produccion compartida.
 5. Disenar el esquema POS antes de crear migraciones.
 6. Construir los primeros flujos de mesas, sesiones y comandas en PRs pequenos.
