@@ -28,6 +28,7 @@ Actualmente:
 - [`docs/architecture/pos-v1.md`](docs/architecture/pos-v1.md) contiene la arquitectura inicial de POS V1;
 - [`docs/deployment/vercel.md`](docs/deployment/vercel.md) documenta el despliegue inicial en Vercel;
 - existe un scaffold inicial de aplicacion con Next.js, React, TypeScript, Tailwind CSS, ESLint y npm;
+- existe un shell inicial navegable de interfaz POS para sala, comanda, cobro, cocina/barra, ticket, turno, administracion y ayuda;
 - no existen migraciones de base de datos POS;
 - Supabase no esta configurado todavia en este repositorio;
 - la URL de produccion es https://sikim-pos.vercel.app;
