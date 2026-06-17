@@ -26,10 +26,11 @@ Actualmente:
 
 - `AGENTS.md` define las instrucciones de trabajo para agentes y colaboradores;
 - [`docs/architecture/pos-v1.md`](docs/architecture/pos-v1.md) contiene la arquitectura inicial de POS V1;
+- [`docs/deployment/vercel.md`](docs/deployment/vercel.md) documenta el despliegue inicial en Vercel;
 - existe un scaffold inicial de aplicacion con Next.js, React, TypeScript, Tailwind CSS, ESLint y npm;
 - no existen migraciones de base de datos POS;
 - Supabase no esta configurado todavia en este repositorio;
-- Vercel no esta configurado todavia en este repositorio;
+- la URL de produccion es https://sikim-pos.vercel.app;
 - existen scripts npm para desarrollo, lint, build y start.
 
 No se deben asumir funcionalidades implementadas solo porque esten descritas como direccion futura.
@@ -51,14 +52,14 @@ Las futuras integraciones con reservas, Cheffing, usuarios, permisos y sesiones 
 El punto de entrada actual de arquitectura es:
 
 - [`docs/architecture/pos-v1.md`](docs/architecture/pos-v1.md)
+- [`docs/deployment/vercel.md`](docs/deployment/vercel.md)
 
-Ese documento define el alcance conceptual de V1, los limites del repositorio, las relaciones esperadas con reservas y Cheffing, y las decisiones que siguen abiertas.
+Estos documentos definen el alcance conceptual de V1, los limites del repositorio, las relaciones esperadas con reservas y Cheffing, el despliegue inicial en Vercel y las decisiones que siguen abiertas.
 
 Documentos futuros podran cubrir:
 
 - diseno de esquema;
 - integracion con Supabase;
-- despliegue en Vercel;
 - permisos POS;
 - estrategia de impresion;
 - pagos y cierre de caja;
@@ -74,9 +75,9 @@ Salvo que el proyecto decida explicitamente otra cosa, la direccion tecnica prev
 - npm;
 - Node.js 20.x;
 - Supabase cuando empiece la integracion de backend y datos;
-- Vercel cuando empiece el despliegue.
+- Vercel para el despliegue.
 
-El scaffold inicial ya sigue esta direccion. Supabase, Vercel y las integraciones siguen pendientes.
+El scaffold inicial ya sigue esta direccion. Supabase y las integraciones siguen pendientes.
 
 ## Fuera del alcance actual
 
@@ -124,7 +125,7 @@ Los datos POS son sensibles porque pueden incluir pedidos, datos de clientes, ac
 
 1. Mantener la documentacion de arquitectura como fuente de verdad.
 2. Mantener el scaffold inicial con Next.js, npm y Node.js 20.
-3. Conectar Vercel despues de acordar el paso de despliegue.
+3. Mantener actualizada la documentacion del despliegue en Vercel.
 4. Decidir integracion Supabase staging vs. produccion compartida.
 5. Disenar el esquema POS antes de crear migraciones.
 6. Construir los primeros flujos de mesas, sesiones y comandas en PRs pequenos.
