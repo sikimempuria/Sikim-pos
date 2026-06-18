@@ -23,7 +23,7 @@ const methods = [
   { id: "manual", label: "Otro/manual" },
 ] as const;
 
-const keypad = ["7", "8", "9", "4", "5", "6", "1", "2", "3", "0", ",", "borrar"];
+const keypad = ["7", "8", "9", "4", "5", "6", "1", "2", "3", "0", ",", "borrar", "exact"];
 
 function parseAmount(value: string) {
   return Number(value.replace(",", ".")) || 0;
@@ -60,6 +60,11 @@ export function PaymentShell() {
   const change = method === "efectivo" ? Math.max(cashReceived - amountDue, 0) : 0;
 
   function appendKey(key: string) {
+    if (key === "exact") {
+      setExact();
+      return;
+    }
+
     if (key === "borrar") {
       setAmountInput((current) => current.slice(0, -1));
       return;
@@ -241,20 +246,16 @@ export function PaymentShell() {
             key={key}
             type="button"
             onClick={() => appendKey(key)}
-            className="min-h-14 rounded-md border border-slate-700 bg-slate-800 px-3 py-3 text-2xl font-black text-white transition hover:bg-slate-700"
+            className={`min-h-14 rounded-md border px-3 py-3 font-black transition ${
+              key === "exact"
+                ? "col-span-3 border-slate-200 bg-slate-50 text-lg text-slate-950 hover:bg-white"
+                : "border-slate-700 bg-slate-800 text-2xl text-white hover:bg-slate-700"
+            }`}
           >
-              {key === "borrar" ? "x" : key}
+              {key === "borrar" ? "x" : key === "exact" ? "Exacte / Exacto" : key}
             </button>
           ))}
         </div>
-
-        <button
-          type="button"
-          onClick={setExact}
-          className="mt-3 min-h-14 w-full rounded-md bg-slate-50 px-4 py-3 text-lg font-black text-slate-950"
-        >
-          Exacte / Exacto
-        </button>
 
         <div className="mt-4 grid gap-3 md:grid-cols-3">
           <div className="rounded-md border border-slate-700 bg-slate-900 p-3">

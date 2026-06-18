@@ -1,72 +1,117 @@
-import { tables, zones } from "@/lib/ui-data";
-import { AdminPageShell, Panel, StatusBadge } from "@/components/ui";
+import { tables, tableZones } from "@/lib/ui-data";
+import { AdminNotice, AdminPageShell, MetricTile, Panel, StatusBadge } from "@/components/ui";
 
 export default function MesasPage() {
+  const selectedTable = tables[0];
+
   return (
     <AdminPageShell
       title="Mesas y zonas"
       description="Shell para configurar zonas, mesas fisicas, capacidad y agrupaciones futuras."
     >
-      <div className="grid gap-4 xl:grid-cols-[320px_1fr]">
-        <Panel tone="light" title="Zonas">
-          <div className="grid gap-3">
-            {zones.map((zone) => (
-              <div
-                key={zone}
-                className="rounded-md border border-slate-200 bg-white p-4"
+      <div className="grid gap-2 md:grid-cols-4 xl:grid-cols-7">
+        <MetricTile tone="light" label="Zones" value={`${tableZones.length}`} />
+        <MetricTile tone="light" label="Taules" value={`${tables.length}`} />
+        <MetricTile tone="light" label="Restaurant" value={`${tables.filter((table) => table.zoneId === "restaurant").length}`} />
+        <MetricTile tone="light" label="Terrassa" value={`${tables.filter((table) => table.zoneId === "terraza").length}`} />
+        <MetricTile tone="light" label="Foodtruck" value={`${tables.filter((table) => table.zoneId === "food-truck").length}`} />
+        <MetricTile tone="light" label="Agrupacions" value="mock" />
+        <MetricTile tone="light" label="Layout" value="v0.4" />
+      </div>
+
+      <AdminNotice>
+        Layout visual mock/local: no persisteix coordenades, agrupacions ni capacitat real.
+      </AdminNotice>
+
+      <div className="grid gap-3 xl:grid-cols-[230px_minmax(0,1fr)_320px]">
+        <Panel tone="light">
+          <p className="admin-section-label">Zones</p>
+          <h2 className="text-xl font-black leading-tight">6 zones operatives</h2>
+          <div className="mt-3 grid gap-2">
+            {tableZones.map((zone, index) => (
+              <button
+                key={zone.id}
+                type="button"
+                className={index === 0 ? "admin-button-primary text-left" : "text-left"}
               >
-                <div className="flex items-center justify-between gap-3">
-                  <p className="font-black">{zone}</p>
-                  <StatusBadge value="activa" />
-                </div>
-                <p className="mt-2 text-sm text-slate-600">
-                  {tables.filter((table) => table.zone === zone).length} mesas
-                </p>
-              </div>
+                <span className="block font-black">{zone.name}</span>
+                <span className="block text-xs text-[#65717d]">
+                  {tables.filter((table) => table.zoneId === zone.id).length} taules
+                </span>
+              </button>
             ))}
           </div>
         </Panel>
 
-        <Panel
-          tone="light"
-          title="Mesas fisicas"
-          description="Capacidad, estado operativo y vista de mapa inicial."
-        >
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-            {tables.map((table) => (
-              <div
-                key={table.id}
-                className="min-h-36 rounded-md border border-slate-200 bg-white p-4"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-lg font-black">{table.name}</p>
-                    <p className="mt-1 text-sm text-slate-500">{table.zone}</p>
-                  </div>
-                  <StatusBadge value={table.status} />
-                </div>
-                <p className="mt-6 text-sm font-bold text-slate-700">
-                  Capacidad: {table.seats} pax
-                </p>
+        <Panel tone="light">
+          <div className="mb-2">
+            <p className="admin-section-label">Taules fisiques</p>
+            <h2 className="text-xl font-black leading-tight">
+              {tables.length} taules exportades
+            </h2>
+          </div>
+          <div className="admin-table-wrap">
+            <table className="min-w-[920px]">
+              <thead>
+                <tr>
+                  <th>Taula</th>
+                  <th>Zona</th>
+                  <th>Coberts</th>
+                  <th>Estat</th>
+                  <th>Reserva</th>
+                  <th>Total</th>
+                  <th>Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                {tables.map((table) => (
+                  <tr key={table.id}>
+                    <td className="font-black">{table.name}</td>
+                    <td>{table.zone}</td>
+                    <td>{table.seats}</td>
+                    <td>
+                      <StatusBadge value={table.status} />
+                    </td>
+                    <td>{table.reservation ?? "-"}</td>
+                    <td>{table.total ? `${table.total.toFixed(2)} €` : "-"}</td>
+                    <td>{table.note ?? "mock/local"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Panel>
+
+        <Panel tone="light">
+          <p className="admin-section-label">Detall taula</p>
+          <div className="flex items-start justify-between gap-3">
+            <h2 className="text-xl font-black leading-tight">{selectedTable.name}</h2>
+            <StatusBadge value={selectedTable.status} />
+          </div>
+          <div className="mt-3 grid gap-2 rounded-lg border border-[#d7dde3] bg-[#f9fafb] p-3">
+            {[
+              ["zone_id", selectedTable.zoneId],
+              ["zone_name", selectedTable.zone],
+              ["seats", `${selectedTable.seats}`],
+              ["status", selectedTable.status],
+              ["reservation", selectedTable.reservation ?? "-"],
+              ["elapsed", selectedTable.elapsed],
+            ].map(([label, value]) => (
+              <div key={label} className="admin-detail-row">
+                <span>{label}</span>
+                <strong>{value}</strong>
               </div>
+            ))}
+          </div>
+          <div className="mt-3 grid gap-2">
+            {["Guardar layout", "Unir mesas", "Separar grupo", "Restaurar layout"].map((action) => (
+              <button key={action} type="button">
+                {action} <span className="text-blue-700">mock</span>
+              </button>
             ))}
           </div>
         </Panel>
       </div>
-
-      <Panel tone="light" title="Agrupacion de mesas">
-        <div className="grid gap-4 lg:grid-cols-3">
-          {["Unir mesas", "Separar grupo", "Conflictos con reserva"].map((item) => (
-            <div key={item} className="rounded-md border border-slate-200 bg-slate-50 p-4">
-              <h2 className="font-black">{item}</h2>
-              <p className="mt-2 text-sm leading-6 text-slate-600">
-                Placeholder para reglas operativas futuras sin persistencia ni
-                cambios de base de datos en esta fase.
-              </p>
-            </div>
-          ))}
-        </div>
-      </Panel>
     </AdminPageShell>
   );
 }

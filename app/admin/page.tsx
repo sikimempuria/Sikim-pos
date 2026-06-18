@@ -7,49 +7,39 @@ export default function AdminPage() {
       title="Inici"
       description="Backoffice SIKIM_POS mock/local para revisar configuracion, estado operativo y modulos pendientes de conectar."
     >
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
-        <MetricTile
-          tone="light"
-          label="Catàleg"
-          value={`${legacyParityCounts.products}`}
-          detail="Total TPV/Cheffing representado"
-        />
-        <MetricTile
-          tone="light"
-          label="Zones"
-          value={`${tableZones.length}`}
-          detail={`${tableCount} taules mock`}
-        />
-        <MetricTile
-          tone="light"
-          label="Impressores"
-          value={`${legacyParityCounts.printerProfiles}`}
-          detail={`${legacyParityCounts.productionRoutes} rutes logiques`}
-        />
+      <div className="grid gap-2 md:grid-cols-4 xl:grid-cols-7">
+        <MetricTile tone="light" label="Cataleg" value={`${legacyParityCounts.products}`} detail="Total TPV/Cheffing" />
+        <MetricTile tone="light" label="Zones" value={`${tableZones.length}`} detail="operatives" />
+        <MetricTile tone="light" label="Taules" value={`${tableCount}`} detail="mock/local" />
+        <MetricTile tone="light" label="Impressores" value={`${legacyParityCounts.printerProfiles}`} detail="perfils logics" />
+        <MetricTile tone="light" label="Rutes" value={`${legacyParityCounts.productionRoutes}`} detail="produccio mock" />
+        <MetricTile tone="light" label="Rols" value="5" detail="conceptual" />
+        <MetricTile tone="light" label="Permisos" value={`${legacyParityCounts.permissionCells}`} detail="matriu conceptual" />
         <MetricTile tone="light" label="Caixa" value="Mock" detail="cash/session local" />
-        <MetricTile
-          tone="light"
-          label="Ajuda"
-          value={`${legacyParityCounts.helpEntries}`}
-          detail="Entrades KB representatives"
-        />
+        <MetricTile tone="light" label="Fiscal" value="Mock" detail="pont fiscal" />
+        <MetricTile tone="light" label="Informes" value="Mock" detail="reporting" />
+        <MetricTile tone="light" label="SIKIM APP" value="Mock" detail="connector" />
+        <MetricTile tone="light" label="Ajuda" value="v0.3" detail="KB representativa" />
       </div>
 
-      <Panel tone="light" title="Modulos">
+      <Panel tone="light">
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {adminModules.map((module) => (
             <a
               key={module.href}
               href={module.href}
-              className="rounded-md border border-slate-200 bg-slate-50 p-4 transition hover:border-sky-400"
+              className="grid min-h-[150px] gap-2 rounded-lg border border-[#d7dde3] bg-white p-4 text-[#20262d] transition hover:border-[#0f766e] hover:bg-[#f7faf9]"
             >
-              <div className="flex items-start justify-between gap-3">
-                <h2 className="text-lg font-black text-slate-950">{module.title}</h2>
-                <StatusBadge value={module.status} />
-              </div>
-              <p className="mt-2 text-sm leading-6 text-slate-600">
+              <span className="admin-section-label">{module.title}</span>
+              <strong className="text-xl font-black leading-tight">
+                {module.description.split(".")[0]}
+              </strong>
+              <p className="text-sm font-extrabold leading-5 text-[#65717d]">
                 {module.description}
               </p>
+              <div className="self-end">
+                <StatusBadge value={module.status} />
+              </div>
             </a>
           ))}
         </div>
@@ -60,7 +50,7 @@ export default function AdminPage() {
         title="Alcance de esta fase"
         description="La UI prepara la estructura de producto sin activar integraciones sensibles."
       >
-        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-4">
           {[
             "Sin Supabase",
             "Sin auth real",
@@ -71,9 +61,12 @@ export default function AdminPage() {
             `${legacyParityCounts.permissionCells} celdas de permisos como matriz conceptual`,
             "No persiste cambios ni usa datos reales",
           ].map((item) => (
-            <div key={item} className="rounded-md border border-slate-200 bg-white p-4">
+            <div
+              key={item}
+              className="rounded-md border border-[#d7dde3] bg-[#f9fafb] p-3"
+            >
               <p className="font-black">{item}</p>
-              <p className="mt-2 text-sm leading-6 text-slate-600">
+              <p className="mt-1 text-sm font-semibold leading-5 text-[#65717d]">
                 Se conectara en una fase posterior con contratos revisados.
               </p>
             </div>
