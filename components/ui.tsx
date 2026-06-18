@@ -65,6 +65,29 @@ const statusClasses: Record<string, string> = {
   pendiente: "border-amber-500/40 bg-amber-100 text-amber-900",
   shell: "border-sky-500/40 bg-sky-100 text-sky-900",
   plan: "border-slate-400 bg-slate-100 text-slate-700",
+  activa: "border-emerald-200 bg-emerald-50 text-emerald-900",
+  active: "border-emerald-200 bg-emerald-50 text-emerald-900",
+  open: "border-emerald-200 bg-emerald-50 text-emerald-900",
+  none: "border-slate-200 bg-slate-100 text-slate-700",
+  queued: "border-blue-200 bg-blue-50 text-blue-900",
+  issued: "border-emerald-200 bg-emerald-50 text-emerald-900",
+  disabled: "border-slate-200 bg-slate-100 text-slate-600",
+  enabled: "border-emerald-200 bg-emerald-50 text-emerald-900",
+  required: "border-emerald-200 bg-emerald-50 text-emerald-900",
+  restricted: "border-emerald-200 bg-emerald-50 text-emerald-900",
+  visible: "border-emerald-200 bg-emerald-50 text-emerald-900",
+  hidden: "border-slate-200 bg-slate-100 text-slate-700",
+  archived: "border-rose-200 bg-rose-50 text-rose-800",
+  "pending config": "border-yellow-300 bg-yellow-50 text-yellow-900",
+  "mock abierta": "border-emerald-200 bg-emerald-50 text-emerald-900",
+  "pendiente backend": "border-yellow-300 bg-yellow-50 text-yellow-900",
+  "sin terminal": "border-amber-300 bg-amber-50 text-amber-900",
+  "por definir": "border-slate-200 bg-slate-100 text-slate-700",
+  si: "border-emerald-200 bg-emerald-50 text-emerald-900",
+  permes: "border-emerald-200 bg-emerald-50 text-emerald-900",
+  preparat: "border-slate-200 bg-slate-100 text-slate-700",
+  "comandas ok": "border-emerald-200 bg-emerald-50 text-emerald-900",
+  "fallback visual": "border-slate-200 bg-slate-100 text-slate-700",
 };
 
 export function PageHeader({
@@ -85,7 +108,7 @@ export function PageHeader({
       <div>
         {eyebrow ? (
           <p
-            className={`mb-2 text-sm font-semibold ${
+            className={`mb-2 text-xs font-black uppercase ${
               dark ? "text-emerald-300" : "text-emerald-700"
             }`}
           >
@@ -119,19 +142,21 @@ export function Panel({
 
   return (
     <section
-      className={`rounded-md border p-4 ${
+      className={`rounded-lg border ${
         dark
-          ? "border-slate-800 bg-slate-900 text-slate-100"
-          : "border-slate-200 bg-white text-slate-950 shadow-sm"
+          ? "border-slate-800 bg-[#101728] p-4 text-slate-100"
+          : "border-[#d7dde3] bg-white p-3 text-[#20262d] shadow-[0_1px_0_rgba(15,23,42,0.03)]"
       } ${className}`}
     >
       {title ? (
-        <div className="mb-4">
-          <h2 className="text-lg font-bold tracking-normal">{title}</h2>
+        <div className="mb-3">
+          <h2 className="text-lg font-black leading-tight tracking-normal">
+            {title}
+          </h2>
           {description ? (
             <p
-              className={`mt-1 text-sm leading-6 ${
-                dark ? "text-slate-400" : "text-slate-600"
+              className={`mt-1 text-sm font-semibold leading-5 ${
+                dark ? "text-slate-400" : "text-[#65717d]"
               }`}
             >
               {description}
@@ -154,18 +179,20 @@ export function MetricTile({
 
   return (
     <div
-      className={`rounded-md border p-4 ${
+      className={`rounded-lg border ${
         dark
-          ? "border-slate-800 bg-slate-900 text-slate-100"
-          : "border-slate-200 bg-white text-slate-950"
+          ? "border-slate-800 bg-[#101728] p-4 text-slate-100"
+          : "border-[#d7dde3] bg-white p-3 text-[#20262d]"
       }`}
     >
-      <p className={dark ? "text-sm text-slate-400" : "text-sm text-slate-500"}>
+      <p className={dark ? "text-sm font-bold text-slate-400" : "text-xs font-black text-[#65717d]"}>
         {label}
       </p>
-      <p className="mt-2 text-2xl font-black">{value}</p>
+      <p className={dark ? "mt-2 text-2xl font-black" : "mt-1 text-2xl font-black leading-none"}>
+        {value}
+      </p>
       {detail ? (
-        <p className={dark ? "mt-1 text-xs text-slate-500" : "mt-1 text-xs text-slate-500"}>
+        <p className={dark ? "mt-1 text-xs font-bold text-slate-500" : "mt-1 text-xs font-bold text-[#65717d]"}>
           {detail}
         </p>
       ) : null}
@@ -198,11 +225,13 @@ export function ActionLink({
 
 export function StatusBadge({ value }: { value: string }) {
   const key = value.toLowerCase();
-  const classes = statusClasses[key] ?? statusClasses.shell;
+  const normalizedKey = key.replaceAll("_", " ");
+  const classes =
+    statusClasses[key] ?? statusClasses[normalizedKey] ?? statusClasses.shell;
 
   return (
     <span
-      className={`inline-flex items-center rounded-md border px-2.5 py-1 text-xs font-bold ${classes}`}
+      className={`inline-flex min-h-[24px] items-center rounded-full border px-2.5 py-0.5 text-[11px] font-black ${classes}`}
     >
       {value}
     </span>
@@ -225,6 +254,14 @@ export function ContentGrid({ children }: { children: ReactNode }) {
   );
 }
 
+export function AdminNotice({ children }: { children: ReactNode }) {
+  return (
+    <div className="rounded-md border border-[#ead28c] bg-[#fffbeb] px-3 py-2 text-sm font-black text-[#705100]">
+      {children}
+    </div>
+  );
+}
+
 export function AdminPageShell({
   title,
   description,
@@ -235,14 +272,10 @@ export function AdminPageShell({
   children: ReactNode;
 }) {
   return (
-    <main className="min-h-[100dvh] bg-slate-100 text-slate-950">
-      <PageHeader
-        tone="light"
-        eyebrow="Administracion POS"
-        title={title}
-        description={description}
-      />
-      <div className="mx-auto grid w-full max-w-[1500px] gap-4 px-4 pb-8 lg:px-6">
+    <main className="admin-workspace min-h-[100dvh] bg-[#f3f5f7] text-[#20262d]">
+      <h1 className="sr-only">{title}</h1>
+      <p className="sr-only">{description}</p>
+      <div className="mx-auto grid w-full max-w-[1780px] gap-3 px-3 pb-8 pt-3 lg:px-4">
         {children}
       </div>
     </main>
