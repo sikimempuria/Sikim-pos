@@ -11,9 +11,9 @@ import {
 import { StatusBadge } from "@/components/ui";
 
 const paymentModes = [
-  { id: "full", label: "Compte complet" },
-  { id: "separate", label: "Pagar per separat" },
-  { id: "split", label: "Dividir compte" },
+  { id: "full", label: "Compte complet / Cuenta completa" },
+  { id: "separate", label: "Pagar per separat / Pagar por separado" },
+  { id: "split", label: "Dividir compte / Dividir cuenta" },
 ] as const;
 
 const methods = [
@@ -350,14 +350,14 @@ export function PaymentShell() {
           href="/ticket"
           className="min-h-12 rounded-md border border-white/10 bg-white/10 px-3 py-3 text-center text-sm font-black text-white"
         >
-          Imprimir ticket
+          Imprimir ticket mock
         </Link>
         <button
           type="button"
           onClick={() => setNotice("Enviament email queda pendent, sense destinatari real.")}
           className="min-h-12 rounded-md border border-white/10 bg-white/10 px-3 py-3 text-sm font-black text-white"
         >
-          Enviar email
+          Enviar email mock
         </button>
         <Link
           href="/pos/comanda"
