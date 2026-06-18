@@ -11,9 +11,9 @@ import {
   staffContext,
   statusLabel,
   tables,
+  tableCount,
   tableStatusLegend,
   tableZones,
-  type Reservation,
   type Table,
   type TableStatus,
 } from "@/lib/ui-data";
@@ -38,6 +38,9 @@ const topAction =
 
 const mapAction =
   "min-h-14 rounded-md border border-white/10 bg-white/10 px-5 py-3 text-base font-black text-slate-100 transition hover:bg-white/20";
+
+const pendingAction =
+  "min-h-11 rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-xs font-black text-slate-100";
 
 function TableTile({
   table,
@@ -88,8 +91,8 @@ function TableTile({
 
 function ReservationPanel({ onClose }: { onClose: () => void }) {
   const actionLabels = [
-    "Acceptar/Aceptar",
-    "Rebutjar/Rechazar",
+    "Acceptar / Aceptar",
+    "Rebutjar / Rechazar",
     "Veure reserva",
     "Assignar taula",
     "Cancel.lar assignacio",
@@ -97,18 +100,6 @@ function ReservationPanel({ onClose }: { onClose: () => void }) {
     "Obrir taula",
     "Tancar reserva 0,00 EUR",
   ];
-
-  function visibleActions(reservation: Reservation) {
-    if (reservation.status === "requested") {
-      return actionLabels.slice(0, 4);
-    }
-
-    if (reservation.status === "assigned" || reservation.status === "confirmed") {
-      return actionLabels.slice(2, 8);
-    }
-
-    return ["Veure reserva", "Obrir taula", "Tancar reserva 0,00 EUR"];
-  }
 
   return (
     <div className="fixed inset-0 z-40 grid place-items-center bg-slate-950/78 p-4">
@@ -138,7 +129,7 @@ function ReservationPanel({ onClose }: { onClose: () => void }) {
             {reservations.map((reservation) => (
               <article
                 key={reservation.id}
-                className="grid gap-3 border-b border-slate-200 pb-4 lg:grid-cols-[1fr_auto]"
+                className="grid gap-3 border-b border-slate-200 pb-4 xl:grid-cols-[280px_1fr]"
               >
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
@@ -156,8 +147,8 @@ function ReservationPanel({ onClose }: { onClose: () => void }) {
                     {reservation.notes ?? "Accions locals de referencia"}
                   </p>
                 </div>
-                <div className="flex max-w-md flex-wrap justify-end gap-2">
-                  {visibleActions(reservation).map((action) => (
+                <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+                  {actionLabels.map((action) => (
                     <button
                       key={`${reservation.id}-${action}`}
                       type="button"
@@ -178,11 +169,11 @@ function ReservationPanel({ onClose }: { onClose: () => void }) {
 
 function HelpPanel({ onClose }: { onClose: () => void }) {
   const faqs = [
-    "No puc cobrar",
-    "No puc enviar cuina",
-    "Com anul.lo un plat?",
-    "Com divideixo un compte?",
-    "No surt la impressora",
+    "Com obro caixa?",
+    "Com obro una taula?",
+    "Com envio cuina?",
+    "Com gestiono una reserva?",
+    "Com marco incidencia?",
   ];
 
   return (
@@ -247,7 +238,9 @@ function HelpPanel({ onClose }: { onClose: () => void }) {
 
 export function PosFloorShell() {
   const [selectedZoneId, setSelectedZoneId] = useState(tableZones[0].id);
-  const [selectedTableId, setSelectedTableId] = useState<string | null>(null);
+  const [selectedTableId, setSelectedTableId] = useState<string | null>(
+    "restaurant-1",
+  );
   const [reservationsOpen, setReservationsOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const [terminalLocked, setTerminalLocked] = useState(false);
@@ -267,7 +260,7 @@ export function PosFloorShell() {
 
   function selectZone(zoneId: string) {
     setSelectedZoneId(zoneId);
-    setSelectedTableId(null);
+    setSelectedTableId(tables.find((table) => table.zoneId === zoneId)?.id ?? null);
   }
 
   return (
@@ -315,6 +308,16 @@ export function PosFloorShell() {
           <span className="text-xs font-black text-slate-400">
             Mode permisos mock/local
           </span>
+          <div className="col-span-3 flex flex-wrap items-center justify-between gap-2 text-xs font-black text-slate-400">
+            <span>
+              Caixa {cashSession.status} - {tableZones.length} zones -{" "}
+              {tableCount} taules
+            </span>
+            <span>
+              Sessio {cashSession.businessDate} - {cashSession.service} - sense
+              backend
+            </span>
+          </div>
           <div className="col-span-3 flex min-w-0 justify-end gap-2 overflow-x-auto pb-0.5">
             <button type="button" className={topAction}>
               Actualitzar
@@ -385,6 +388,10 @@ export function PosFloorShell() {
             <h2 className="text-4xl font-black leading-none text-white">
               {selectedZone.name}
             </h2>
+            <p className="mt-2 text-sm font-black text-slate-400">
+              {visibleTables.length} taules visibles - {tableCount} totals - flux
+              mock/local
+            </p>
           </div>
           <div className="flex flex-wrap gap-2">
             <button
@@ -463,42 +470,91 @@ export function PosFloorShell() {
         ) : null}
 
         {selectedTable ? (
-          <section className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-md border border-white/10 bg-white/10 p-3">
-            <div>
+          <section className="mt-3 grid gap-3 rounded-md border border-white/10 bg-white/10 p-3 xl:grid-cols-[0.9fr_1.1fr_1.2fr]">
+            <div className="rounded-md border border-white/10 bg-slate-950/40 p-3">
               <p className="text-xs font-black uppercase text-slate-400">
                 Taula seleccionada
               </p>
-              <p className="text-lg font-black text-white">
-                {selectedTable.name} - {selectedTable.zone} -{" "}
-                {formatCurrency(activeTotal)}
+              <p className="mt-1 text-2xl font-black text-white">
+                {selectedTable.zone} - {selectedTable.name}
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <StatusBadge value={selectedTable.status} />
+                <span className="rounded-md border border-slate-700 bg-slate-950 px-2 py-1 text-xs font-black text-slate-300">
+                  {selectedTable.seats} coberts
+                </span>
+                <span className="rounded-md border border-blue-300/40 bg-blue-300/10 px-2 py-1 text-xs font-black text-blue-100">
+                  sessio mock {selectedTable.elapsed}
+                </span>
+              </div>
+              <p className="mt-3 text-sm font-bold leading-5 text-slate-400">
+                {selectedTable.note ??
+                  selectedTable.reservation ??
+                  "Llista per obrir una sessio de taula o comanda directa."}
               </p>
             </div>
-            <div className="flex flex-wrap gap-2">
-              <button type="button" className={topAction}>
-                Obrir mesa mock
+
+            <div className="rounded-md bg-slate-50 p-3 text-slate-950">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs font-black uppercase text-slate-500">
+                    Ticket / comanda preview
+                  </p>
+                  <h3 className="text-xl font-black">
+                    {selectedTable.zone} - {selectedTable.name}
+                  </h3>
+                </div>
+                <p className="text-2xl font-black">{formatCurrency(activeTotal)}</p>
+              </div>
+              <div className="mt-3 grid gap-2">
+                {orderLines.slice(0, 3).map((line) => (
+                  <div
+                    key={line.id}
+                    className="grid grid-cols-[1fr_auto] gap-3 rounded-md border border-slate-200 bg-white px-3 py-2"
+                  >
+                    <span className="text-sm font-black">
+                      {line.qty} x {line.name}
+                    </span>
+                    <span className="text-sm font-black">
+                      {formatCurrency(line.qty * line.price)}
+                    </span>
+                    <span className="text-xs font-bold text-slate-500">
+                      {statusLabel(line.status)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid gap-2 sm:grid-cols-2">
+              <button type="button" className={pendingAction}>
+                Abrir mesa <span className="text-blue-200">mock</span>
               </button>
-              <Link href="/pos/comanda" className={topAction}>
+              <Link href="/pos/comanda" className={pendingAction}>
                 Ver comanda
               </Link>
-              <Link href="/pos/cobro" className={topAction}>
+              <Link href="/pos/cobro" className={pendingAction}>
                 Cobrar
               </Link>
-              <button type="button" className={topAction}>
-                Enviar cocina mock
+              <button type="button" className={pendingAction}>
+                Enviar cocina <span className="text-blue-200">mock</span>
               </button>
               <button
                 type="button"
                 onClick={() => setReservationsOpen(true)}
-                className={topAction}
+                className={pendingAction}
               >
-                Buscar reserva
+                Buscar reserva <span className="text-blue-200">mock</span>
               </button>
-              <button type="button" className={topAction}>
-                Mover mesa mock
+              <button type="button" className={pendingAction}>
+                Mover mesa <span className="text-amber-200">pendiente</span>
               </button>
-              <button type="button" className={topAction}>
-                Marcar incidencia
+              <button type="button" className={pendingAction}>
+                Marcar incidencia <span className="text-blue-200">mock</span>
               </button>
+              <Link href="/pos/comanda" className={pendingAction}>
+                Crear comanda directa
+              </Link>
             </div>
           </section>
         ) : null}
@@ -559,9 +615,12 @@ export function PosFloorShell() {
       <Link
         href="/pos/comanda"
         aria-label="Crear comanda directa"
-        className="fixed bottom-14 right-5 z-30 grid h-16 w-16 place-items-center rounded-full bg-blue-500 text-4xl font-black text-white shadow-2xl"
+        className="fixed bottom-14 right-5 z-30 flex min-h-16 items-center gap-3 rounded-full bg-blue-500 px-5 py-3 text-base font-black text-white shadow-2xl"
       >
-        +
+        <span className="grid h-10 w-10 place-items-center rounded-full bg-white/15 text-3xl">
+          +
+        </span>
+        Crear comanda directa
       </Link>
     </div>
   );
