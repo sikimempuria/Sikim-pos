@@ -52,7 +52,7 @@ export default function AdminPage() {
       >
         <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-4">
           {[
-            "Sin Supabase",
+            "Supabase solo base/config",
             "Sin auth real",
             "Sin pagos reales",
             "Sin impresoras reales",

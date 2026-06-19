@@ -24,6 +24,7 @@ const requiredRoutes = [
   "app/admin/usuarios/page.tsx",
   "app/admin/fiscal/page.tsx",
   "app/admin/sikim-app/page.tsx",
+  "app/admin/supabase/page.tsx",
   "app/admin/help/page.tsx",
   "app/ayuda/page.tsx",
 ];
@@ -32,9 +33,15 @@ const sourceRoots = ["app", "components", "lib"];
 const forbiddenSourcePatterns = [
   /\blocalStorage\b/,
   /\bsessionStorage\b/,
-  /@supabase\//,
-  /createClient\(/,
   /service_role/i,
+];
+const allowedSupabaseClientFiles = new Set([
+  "lib/supabase/client.ts",
+  "lib/supabase/server.ts",
+]);
+const forbiddenSupabaseBusinessQueryPatterns = [
+  /\.from\(\s*["'`](?:reservations?|customers?|orders?|order_lines?|cheffing_[^"'`]*|group_events?|external_reservation_submissions|pos_[^"'`]*)["'`]/i,
+  /\.rpc\(\s*["'`](?:accept_reservation|reject_reservation|send_to_kitchen|create_order|record_payment|close_shift|pos_[^"'`]*)["'`]/i,
 ];
 
 const ignoredDirectories = new Set([".git", ".next", "node_modules"]);
@@ -63,6 +70,10 @@ function walkFiles(relativeDirectory) {
   });
 }
 
+function normalizePath(file) {
+  return file.replaceAll(path.sep, "/");
+}
+
 test("the initial POS UI shell exposes every required route", () => {
   const missingRoutes = requiredRoutes.filter(
     (route) => !existsSync(path.join(root, route)),
@@ -83,16 +94,55 @@ test("the UI shell does not add forbidden backend or persistence artifacts", () 
   assert.deepEqual(committedZipCandidates, []);
 });
 
-test("frontend source avoids Supabase clients and browser persistence", () => {
+test("environment example contains only approved placeholder variables", () => {
+  const envExamplePath = path.join(root, ".env.example");
+  assert.equal(existsSync(envExamplePath), true);
+
+  const envExample = readFileSync(envExamplePath, "utf8")
+    .replaceAll("\r\n", "\n")
+    .trimEnd();
+  assert.equal(
+    envExample,
+    [
+      "NEXT_PUBLIC_SUPABASE_URL=",
+      "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=",
+      "",
+      "POS_ACCESS_PASSWORD_HASH=",
+      "POS_SESSION_SECRET=",
+      "POS_SESSION_MAX_AGE_SECONDS=259200",
+    ].join("\n"),
+  );
+});
+
+test("frontend source avoids browser persistence and only uses approved Supabase helpers", () => {
   const sourceFiles = sourceRoots.flatMap(walkFiles).filter((file) =>
     /\.(ts|tsx|js|jsx|css)$/.test(file),
   );
 
   const violations = sourceFiles.flatMap((file) => {
+    const normalizedFile = normalizePath(file);
     const source = readFileSync(path.join(root, file), "utf8");
-    return forbiddenSourcePatterns
+    const generalViolations = forbiddenSourcePatterns
       .filter((pattern) => pattern.test(source))
       .map((pattern) => `${file}: ${pattern}`);
+    const supabaseImportViolations =
+      /@supabase\//.test(source) && !allowedSupabaseClientFiles.has(normalizedFile)
+        ? [`${file}: unexpected Supabase import`]
+        : [];
+    const supabaseCreateClientViolations =
+      /createClient\(/.test(source) && !allowedSupabaseClientFiles.has(normalizedFile)
+        ? [`${file}: unexpected createClient usage`]
+        : [];
+    const businessQueryViolations = forbiddenSupabaseBusinessQueryPatterns
+      .filter((pattern) => pattern.test(source))
+      .map((pattern) => `${file}: ${pattern}`);
+
+    return [
+      ...generalViolations,
+      ...supabaseImportViolations,
+      ...supabaseCreateClientViolations,
+      ...businessQueryViolations,
+    ];
   });
 
   assert.deepEqual(violations, []);

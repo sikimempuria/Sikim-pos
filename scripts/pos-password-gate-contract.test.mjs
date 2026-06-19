@@ -6,6 +6,10 @@ import test from "node:test";
 const root = process.cwd();
 const ignoredDirectories = new Set([".git", ".next", "node_modules"]);
 const sourceRoots = ["app", "components", "lib"];
+const allowedSupabaseClientFiles = new Set([
+  "lib/supabase/client.ts",
+  "lib/supabase/server.ts",
+]);
 
 function read(relativePath) {
   return readFileSync(path.join(root, relativePath), "utf8");
@@ -33,6 +37,10 @@ function walkFiles(relativeDirectory) {
 
     return [relativePath];
   });
+}
+
+function normalizePath(file) {
+  return file.replaceAll(path.sep, "/");
 }
 
 test("password gate files are present", () => {
@@ -71,6 +79,8 @@ test("password gate keeps secrets server-side and avoids browser persistence", (
   assert.equal(existsSync(path.join(root, ".env.local")), false);
 
   const envExample = read(".env.example");
+  assert.match(envExample, /^NEXT_PUBLIC_SUPABASE_URL=$/m);
+  assert.match(envExample, /^NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=$/m);
   assert.match(envExample, /^POS_ACCESS_PASSWORD_HASH=$/m);
   assert.match(envExample, /^POS_SESSION_SECRET=$/m);
   assert.match(envExample, /^POS_SESSION_MAX_AGE_SECONDS=259200$/m);
@@ -79,19 +89,25 @@ test("password gate keeps secrets server-side and avoids browser persistence", (
     /\.(ts|tsx|js|jsx)$/.test(file),
   );
   const violations = sourceFiles.flatMap((file) => {
+    const normalizedFile = normalizePath(file);
     const source = read(file);
-    return [
+    const generalViolations = [
       /NEXT_PUBLIC_POS_ACCESS_PASSWORD/,
       /NEXT_PUBLIC_.*PASSWORD/,
       /\blocalStorage\b/,
       /\bsessionStorage\b/,
-      /@supabase\//,
       /service_role/i,
       /POS_ACCESS_PASSWORD_HASH[\s\S]{0,120}(?:\|\||\?\?)\s*["'`][^"'`]+["'`]/,
       /POS_SESSION_SECRET[\s\S]{0,120}(?:\|\||\?\?)\s*["'`][^"'`]+["'`]/,
     ]
       .filter((pattern) => pattern.test(source))
       .map((pattern) => `${file}: ${pattern}`);
+    const supabaseImportViolations =
+      /@supabase\//.test(source) && !allowedSupabaseClientFiles.has(normalizedFile)
+        ? [`${file}: unexpected Supabase import`]
+        : [];
+
+    return [...generalViolations, ...supabaseImportViolations];
   });
 
   assert.deepEqual(violations, []);

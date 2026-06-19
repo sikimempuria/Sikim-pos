@@ -160,6 +160,7 @@ export const adminLinks = [
   { href: "/admin/comandas", label: "Comandes" },
   { href: "/admin/informes", label: "Informes" },
   { href: "/admin/sikim-app", label: "SIKIM APP" },
+  { href: "/admin/supabase", label: "Supabase" },
   { href: "/admin/caja", label: "Caixa" },
   { href: "/admin/fiscal", label: "Fiscal / Odoo" },
   { href: "/admin/usuarios", label: "Usuaris i permisos" },
@@ -804,6 +805,12 @@ export const adminModules: AdminModule[] = [
     href: "/admin/sikim-app",
     description: "Eventos mock POS -> SIKIM APP para stock/inventario futuro.",
     status: "Mock",
+  },
+  {
+    title: "Supabase",
+    href: "/admin/supabase",
+    description: "Diagnostico protegido de variables y cliente base, sin tablas reales.",
+    status: "pending config",
   },
   {
     title: "Caixa",

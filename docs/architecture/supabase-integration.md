@@ -4,13 +4,13 @@
 
 Este documento define cómo `Sikim-pos` debería integrarse con Supabase y con el ecosistema de datos internos de Sikim.
 
-La intención es preparar futuras tareas de implementación con una dirección clara sobre datos, permisos, seguridad, reservas y Cheffing. Este documento no implementa Supabase, no añade cliente Supabase, no crea variables de entorno, no crea migraciones y no cambia el comportamiento actual de la aplicación.
+La intención es preparar futuras tareas de implementación con una dirección clara sobre datos, permisos, seguridad, reservas y Cheffing. La base mínima de cliente Supabase ya existe, pero este documento no crea migraciones ni cambia flujos de negocio.
 
 ## Estado actual
 
 El estado actual de `Sikim-pos` es:
 
-- la aplicación todavía no está conectada a Supabase;
+- la aplicación tiene una base mínima de cliente Supabase y diagnóstico protegido en `/admin/supabase`;
 - la interfaz POS actual funciona con datos mock/locales;
 - la aplicación está protegida por una puerta global de contraseña;
 - no existen migraciones POS en este repositorio;
@@ -18,7 +18,7 @@ El estado actual de `Sikim-pos` es:
 - no existe persistencia real en base de datos;
 - el despliegue en Vercel ya existe;
 - las variables de entorno de la puerta de contraseña existen en el despliegue;
-- las variables de entorno de Supabase todavía no están configuradas.
+- las variables de entorno de Supabase pueden no estar configuradas y la aplicación debe seguir compilando.
 
 La puerta de contraseña actual protege el acceso inicial al despliegue, pero no representa todavía un modelo de permisos por usuario, auditoría individual, caja, cobro o anulación.
 
@@ -274,9 +274,9 @@ Ejemplos de operaciones sensibles:
 - cerrar turno;
 - cambiar configuración de catálogo POS.
 
-## Variables de entorno futuras
+## Variables de entorno
 
-Variables públicas futuras para cliente Supabase, sin valores reales:
+Variables públicas para cliente Supabase, sin valores reales:
 
 - `NEXT_PUBLIC_SUPABASE_URL`;
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.
@@ -293,7 +293,8 @@ Reglas:
 - no añadir archivos de entorno en esta tarea;
 - nunca exponer la clave `service-role` al navegador;
 - los secretos server-only no deben usar prefijo `NEXT_PUBLIC_`;
-- la documentación de variables puede venir en un PR posterior, antes del cliente Supabase.
+- si faltan las variables Supabase, la aplicación muestra estado no configurado en `/admin/supabase`;
+- tras configurar variables en Vercel hace falta redeploy.
 
 ## Seguridad y RLS
 
@@ -334,11 +335,11 @@ Cada evento debería registrar actor, timestamp, entidad afectada, acción, esta
 
 Secuencia recomendada:
 
-1. Documento de arquitectura Supabase. Tarea actual.
+1. Documento de arquitectura Supabase. Hecho.
 2. Decidir enfoque staging/producción.
-3. Añadir documentación de variables Supabase / plan de variables Vercel.
-4. Añadir base mínima de cliente Supabase.
-5. Añadir ruta interna de health/check o estado si aporta valor.
+3. Añadir documentación de variables Supabase / plan de variables Vercel. Hecho.
+4. Añadir base mínima de cliente Supabase. Hecho.
+5. Añadir ruta interna de health/check o estado si aporta valor. Hecho: `/admin/supabase`.
 6. Plan de auth/sesión más allá de la puerta de contraseña.
 7. Diseñar el primer esquema POS.
 8. Revisar RLS y propiedad de migraciones.
@@ -357,9 +358,7 @@ Cada fase debe poder revisarse como PR pequeño y temático.
 
 Fuera de alcance de este documento y de esta tarea:
 
-- añadir dependencias Supabase;
-- añadir cliente Supabase;
-- añadir archivos `.env`, `.env.local` o `.env.example`;
+- añadir archivos `.env` o `.env.local`;
 - añadir migraciones;
 - conectar autenticación;
 - cambiar RLS;
@@ -396,8 +395,8 @@ Quedan abiertas:
 La recomendación inicial es:
 
 - mantener la puerta de contraseña mientras POS todavía no escribe en Supabase;
-- documentar variables Supabase y plan Vercel en el siguiente paso;
-- conectar Supabase en un PR mínimo posterior a este documento;
+- mantener documentadas las variables Supabase y el plan Vercel;
+- usar la base mínima de cliente Supabase para futuros PRs de lectura revisados;
 - hacer que el primer PR técnico de Supabase no cree tablas todavía;
 - hacer que el primer PR de base de datos/migraciones sea POS-only y pequeño;
 - mantener como objetivo final el mismo ecosistema Supabase que `Sikim-gestio-reserves`;

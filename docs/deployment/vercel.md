@@ -4,7 +4,7 @@
 
 El scaffold inicial de Next.js de Sikim POS ya esta desplegado en Vercel.
 
-La aplicacion de produccion esta protegida por una puerta inicial de contrasena compartida. Todavia no hay Supabase, autenticacion real de usuarios ni integraciones operativas conectadas.
+La aplicacion de produccion esta protegida por una puerta inicial de contrasena compartida. Existe una base minima de cliente Supabase, pero todavia no hay autenticacion real de usuarios ni integraciones operativas conectadas.
 
 ## URL de producción
 
@@ -42,14 +42,14 @@ node -e "const crypto=require('crypto'); console.log(crypto.createHash('sha256')
 node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
 
-Cuando empiece la integracion con Supabase, las variables se deben configurar en los settings del proyecto en Vercel y no se deben commitear en el repositorio.
-
-Variables futuras posibles:
+La base minima de cliente Supabase usa variables publicas de Vercel, sin valores commiteados:
 
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
 
-Estas variables son placeholders futuros y no quedan configuradas por este PR. No se deben incluir claves reales en la documentacion ni en archivos del repositorio.
+Estas variables siguen separadas de las variables de la puerta de contrasena. No se deben incluir claves reales en la documentacion ni en archivos del repositorio. No se debe configurar una clave `service-role` para el navegador ni en ninguna variable `NEXT_PUBLIC_*`.
+
+Si faltan las variables de Supabase, la aplicacion debe seguir compilando y `/admin/supabase` debe mostrar estado no configurado. Tras anadir o cambiar variables en Vercel, hace falta redeploy.
 
 ## Flujo de despliegue
 
@@ -86,7 +86,7 @@ Si aparece un problema de instalacion, lint, build o runtime, la reproduccion y 
 
 Limitaciones actuales del despliegue:
 
-- no hay conexion con Supabase todavia;
+- no hay lecturas ni escrituras de tablas Supabase todavia;
 - no hay autenticacion real de usuarios todavia;
 - la puerta de acceso actual es una contrasena compartida temporal;
 - no hay modulos POS todavia;

@@ -38,6 +38,10 @@ const adminRouteMeta: Record<string, { title: string; status: string }> = {
     title: "SIKIM APP",
     status: "connector mock/local",
   },
+  "/admin/supabase": {
+    title: "Supabase",
+    status: "diagnostic config · no data queries",
+  },
   "/admin/caja": {
     title: "Caixa i informe diari",
     status: "backoffice_cash_register_mock · open",
