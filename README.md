@@ -30,7 +30,8 @@ Actualmente:
 - existe un scaffold inicial de aplicacion con Next.js, React, TypeScript, Tailwind CSS, ESLint y npm;
 - existe un shell inicial navegable de interfaz POS para sala, comanda, cobro, cocina/barra, ticket, turno, administracion y ayuda;
 - no existen migraciones de base de datos POS;
-- Supabase no esta configurado todavia en este repositorio;
+- existe una base minima de cliente Supabase y una pagina protegida de diagnostico en `/admin/supabase`;
+- Supabase puede quedar sin configurar en CI/build sin romper la aplicacion;
 - la URL de produccion es https://sikim-pos.vercel.app;
 - existen scripts npm para desarrollo, lint, build y start.
 - la aplicacion esta protegida por una puerta inicial de contrasena compartida antes de conectar Supabase.
@@ -79,7 +80,24 @@ Salvo que el proyecto decida explicitamente otra cosa, la direccion tecnica prev
 - Supabase cuando empiece la integracion de backend y datos;
 - Vercel para el despliegue.
 
-El scaffold inicial ya sigue esta direccion. Supabase y las integraciones siguen pendientes.
+El scaffold inicial ya sigue esta direccion. La base minima de cliente Supabase existe, pero las integraciones de negocio siguen pendientes.
+
+## Supabase
+
+La primera base tecnica de Supabase usa `@supabase/supabase-js` con URL publica y publishable key. No usa `@supabase/ssr`, no integra Supabase Auth, no lee tablas de negocio y no escribe datos.
+
+Variables publicas necesarias cuando se configure Supabase en Vercel o localmente:
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+
+Estas variables son independientes de la puerta de contrasena:
+
+- `POS_ACCESS_PASSWORD_HASH`
+- `POS_SESSION_SECRET`
+- `POS_SESSION_MAX_AGE_SECONDS`
+
+No configurar claves `service-role` en el navegador ni como variables `NEXT_PUBLIC_*`. Tras anadir o cambiar variables en Vercel, hace falta redeploy.
 
 ## Acceso inicial
 
